@@ -3,7 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
-
+import "@/styles/common.scss"
 import { Category } from './apis/testApis'
 Category().then(
     res => {console.log(res)}
