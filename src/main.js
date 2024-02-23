@@ -3,6 +3,12 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
+
+import { Category } from './apis/testApis'
+Category().then(
+    res => {console.log(res)}
+)
+
 import App from './App.vue'
 import router from './router'
 
