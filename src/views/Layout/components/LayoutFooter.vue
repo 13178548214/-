@@ -11,7 +11,7 @@
         <dl>
           <dt>关注我们</dt>
           <dd><i class="iconfont icon-weixin"></i> 公众号</dd>
-          <dd><i class="iconfont icon-weibo"></i> 微博</dd>
+          <dd><i class="icon-xinlangweibo"></i> 微博</dd>
         </dl>
         <dl>
           <dt>下载APP</dt>
