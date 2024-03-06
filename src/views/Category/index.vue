@@ -1,16 +1,18 @@
 <script setup>
 import { getCategoryAPI } from '@/apis/category';
 import {ref,onMounted} from 'vue'
-import { useRoute } from 'vue-router';
+import { useRoute,onBeforeRouteUpdate } from 'vue-router';
 import {getBannerAPI} from '@/apis/home'
+import GoodsItem from '../Home/components/GoodsItem.vue';
+
 
 const categoryData = ref({})
 const route = useRoute()
 
 const BannerList = ref([])
 
-const getCategory = async() =>{
-  const res = await getCategoryAPI(route.params.id)
+const getCategory = async(id=route.params.id) =>{
+  const res = await getCategoryAPI(id)
   categoryData.value = res.result
 }
 
@@ -22,6 +24,11 @@ const getBanner = async() =>{
 onMounted(()=>
   {getCategory(),getBanner()}
 )
+
+/* 在路由改变前获取到新的参数重新渲染新的路由 */
+onBeforeRouteUpdate((to)=>{
+   getCategory(to.params.id)
+})
 </script>
 
 <template>
@@ -42,7 +49,7 @@ onMounted(()=>
             </el-carousel-item>
           </el-carousel>
         </div>
-        <!-- <div class="sub-list">
+        <div class="sub-list">
           <h3>全部分类</h3>
           <ul>
             <li v-for="i in categoryData.children" :key="i.id">
@@ -58,9 +65,9 @@ onMounted(()=>
             <h3>- {{ item.name }}-</h3>
           </div>
           <div class="body">
-            <GoodsItem v-for="good in item.goods" :goods="good" :key="good.id" />
+            <GoodsItem v-for="good in item.goods" :good="good" :key="good.id" />
           </div>
-        </div> -->
+        </div>
       </div>
     </div>
   </template>
