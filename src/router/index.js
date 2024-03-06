@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { Category } from '@/apis/testApis'
+import  Category  from '@/views/Category/index.vue'
 import Home from '@/views/Home/index.vue'
 import Layout from '@/views/Layout/index.vue'
 import Login from '@/views/Login/index.vue'
@@ -14,7 +14,7 @@ const router = createRouter({
        path: '',
        component: Home,
       },
-      {path: '/Category',
+      {path: 'category/:id',
        component: Category}]
     },
     {
