@@ -29,6 +29,12 @@ const getGoodList = async() =>{
 onMounted(()=>{
   getGoodList()
 })
+
+const tabchange = () =>{
+  console.log(reqData.value.sortField);
+  reqData.value.page = 1
+  getGoodList()
+}
 </script>
 
 <template>
@@ -44,7 +50,8 @@ onMounted(()=>{
       </el-breadcrumb>
     </div>
     <div class="sub-container">
-      <el-tabs>
+      <!-- 点击以下三个按钮之后 name的数据传给了v-model 将reaData.sortField 修改了 接着触发了点击事件，接口通过改变后的参数发新的数据 -->
+      <el-tabs v-model="reqData.sortField" @tab-change="tabchange">
         <el-tab-pane label="最新商品" name="publishTime"></el-tab-pane>
         <el-tab-pane label="最高人气" name="orderNum"></el-tab-pane>
         <el-tab-pane label="评论最多" name="evaluateNum"></el-tab-pane>
