@@ -3,8 +3,6 @@ import {GetDetailAPI} from '@/apis/detail'
 import {ref,onMounted} from 'vue'
 import { useRoute } from 'vue-router';
 import DetailHot from './components/DetailHot.vue';
-import ImageView from '@/components/ImageView/index.vue'
-import XtxSku from '@/components/XtxSku/index.vue'
 const route = useRoute()
 const goods = ref({})
 const getDeatil = async () =>{
@@ -12,7 +10,7 @@ const getDeatil = async () =>{
    goods.value = res.result
 }
 
-function skuChange(sku){
+const skuChange = (sku)=>{
     console.log(sku);
 }
 
@@ -38,7 +36,7 @@ onMounted(()=>{getDeatil()})
           <div class="goods-info">
             <div class="media">
               <!-- 图片预览区 -->
-              <ImageView :image-list="goods.mainPictures"/>
+              <XtxImageView :image-list="goods.mainPictures"/>
               <!-- 统计数量 -->
               <ul class="goods-sales">
                 <li>
@@ -87,7 +85,7 @@ onMounted(()=>{getDeatil()})
                 </dl>
               </div>
               <!-- sku组件 -->
-              <XtxSku :goods="goods" :change="skuChange"/>
+              <XtxSku :goods="goods" @change="skuChange"/>
               <!-- 数据组件 -->
 
               <!-- 按钮组件 -->
