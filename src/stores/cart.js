@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import {ref} from 'vue'
+import {computed, ref} from 'vue'
 export const getCartStore = defineStore('cart',()=>{
     //定义一个购物清单
     const cartList = ref([])
@@ -14,9 +14,19 @@ export const getCartStore = defineStore('cart',()=>{
         cartList.value.push(goods)
     }
     }
+    const cartdelate = (id) =>{
+       /* const xid =  cartList.value.findIndex((item)=>item.skuId === id)
+       cartList.value.splice(xid,1) */
+       cartList.value = cartList.value.filter((item)=>item.skuId !== id)
+    }
+    const allCount =computed(()=>cartList.value.reduce((a,c)=>a+c.count,0)) 
+    const allPrice =computed(()=>cartList.value.reduce((a,c)=>a+c.count*c.price,0)) 
     return{
+        allCount,
+        allPrice,
         cartList,
-        cartAdd
+        cartAdd,
+        cartdelate
     }
 },{
     persist: true,
