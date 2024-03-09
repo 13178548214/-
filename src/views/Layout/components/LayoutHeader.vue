@@ -1,7 +1,8 @@
 <script setup>
 import { getCategoryAPI } from '@/apis/layout';
 import {onMounted,ref} from 'vue'
-
+import HeaderCar from '@/views/Layout/components/HeaderCar.vue'
+import LayoutHeaderUI from './LayoutHeaderUI.vue';
 const CategoryList = ref([])
 
 const getCategory = async() =>{
@@ -20,17 +21,18 @@ onMounted(() => {
       <h1 class="logo">
         <RouterLink to="/">小兔鲜</RouterLink>
       </h1>
-      <ul class="app-header-nav">
+      <!-- <ul class="app-header-nav">
         <li class="home" v-for="item in CategoryList" :key="item.id">
           <RouterLink active-class="active" :to="`/category/${item.id}`">{{ item.name }}</RouterLink>
         </li>
-      </ul>
+      </ul> -->
+      <LayoutHeaderUI />
       <div class="search">
         <i class="iconfont icon-search"></i>
         <input type="text" placeholder="搜一搜">
       </div>
       <!-- 头部购物车 -->
-      
+      <HeaderCar />
     </div>
   </header>
 </template>
