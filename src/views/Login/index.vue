@@ -4,7 +4,7 @@ import {ref} from 'vue'
 const from  = ref({
   account:"",
   password:"",
-  agree:true
+  agree:false
 })
 
 const rules = {
@@ -28,6 +28,15 @@ const rules = {
   }
 
   ]
+}
+
+const fromRef = ref(null)
+const sure = () =>{
+  fromRef.value.validate((valid)=>{
+     if(valid){
+      //
+     }
+  })
 }
 </script>
 
@@ -54,7 +63,7 @@ const rules = {
         <div class="account-box">
           <div class="form" >
             <el-form label-position="right" label-width="60px"
-              status-icon :model="from" :rules="rules">
+              status-icon ref="fromRef" :model="from" :rules="rules" >
               <el-form-item prop="account" label="账户">
                 <el-input v-model="from.account"/>
               </el-form-item>
@@ -66,7 +75,7 @@ const rules = {
                   我已同意隐私条款和服务条款
                 </el-checkbox>
               </el-form-item>
-              <el-button size="large" class="subBtn">点击登录</el-button>
+              <el-button size="large" class="subBtn" @click="sure">点击登录</el-button>
             </el-form>
           </div>
         </div>
