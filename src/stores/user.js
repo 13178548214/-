@@ -7,11 +7,16 @@ export const useUserStore =defineStore( 'user',()=>{
     const res =   await getUserAPI({account,password})
       userInfo.value = res.result
     }
+    const clearInfo = () =>{
+        userInfo.value = {}
+    }
     return {
         userInfo,
-        getUserInfo
+        getUserInfo,
+        clearInfo
     }
 },
+
 {
     persist: true,
   }
