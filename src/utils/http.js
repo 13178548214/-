@@ -5,6 +5,7 @@ const httpInstance = axios.create({
   baseURL: 'http://pcapi-xiaotuxian-front-devtest.itheima.net',
   timeout: 5000
 })
+import 'element-plus/theme-chalk/el-message.css'
 
 // 拦截器
 

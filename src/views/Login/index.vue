@@ -1,6 +1,11 @@
 <script setup>
 import {ref} from 'vue'
+import { useUserStore } from '@/stores/user';
+import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus'
+import 'element-plus/theme-chalk/el-message.css'
 
+const userStore = useUserStore()
 const from  = ref({
   account:"",
   password:"",
@@ -31,13 +36,20 @@ const rules = {
 }
 
 const fromRef = ref(null)
-const sure = () =>{
-  fromRef.value.validate((valid)=>{
+const router = useRouter()
+const sure =() =>{
+  const {account,password} = from.value
+  fromRef.value.validate(async (valid)=>{
      if(valid){
-      //
+      await userStore.getUserInfo({account,password})
+      //提示用户
+      ElMessage({type:'success',message:'成功登录'})
+      router.replace({path:'/'})
      }
   })
 }
+
+
 </script>
 
 
