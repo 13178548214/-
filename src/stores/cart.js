@@ -62,6 +62,7 @@ export const getCartStore = defineStore('cart',()=>{
         allCount,
         allPrice,
         cartList,
+        updatedList,
         clearCart,
         cartChange,
         cartAdd,

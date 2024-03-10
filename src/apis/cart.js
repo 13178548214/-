@@ -27,3 +27,11 @@ export const deleteCartList = (ids)=>{
     }
 )
 }
+
+export const mergeCartAPI = (data)=>{
+    return httpInstance({
+        url:'/member/cart/merge',
+        method:'POST',
+        data
+    })
+}
