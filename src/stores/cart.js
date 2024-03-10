@@ -23,15 +23,22 @@ export const getCartStore = defineStore('cart',()=>{
         const item = cartList.value.find((item) => item.skuId === id)   //find返回元素
         item.selected = selected
     }
+     /* newCartList.value =computed(()=>cartList.value.filter(item=>item.selected === true))  */
+    const newCartList =computed(()=>cartList.value.filter(item=>item.selected))
+    const isNeed = computed(()=>newCartList.value.reduce((a,c)=>a+c.count,0))
+    const needPrice = computed(()=>newCartList.value.reduce((a,c)=>a+c.count*c.price,0))
+
     const isAll = computed(()=>cartList.value.every((item)=>item.selected))
     const allCount =computed(()=>cartList.value.reduce((a,c)=>a+c.count,0)) 
     const allPrice =computed(()=>cartList.value.reduce((a,c)=>a+c.count*c.price,0)) 
     return{
-        cartChange,
+        needPrice,
+        isNeed,
         isAll,
         allCount,
         allPrice,
         cartList,
+        cartChange,
         cartAdd,
         cartdelate
     }
