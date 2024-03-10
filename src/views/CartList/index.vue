@@ -1,7 +1,11 @@
 <script setup>
 import {getCartStore} from '@/stores/cart'
-
 const cartStore = getCartStore()
+
+function selChange(i,selected){
+ cartStore.cartChange(i.skuId,selected)
+ console.log(i);
+}
 </script>
 
 <template>
@@ -25,7 +29,7 @@ const cartStore = getCartStore()
           <tbody>
             <tr v-for="i in cartStore.cartList" :key="i.id">
               <td>
-                <el-checkbox />
+                <el-checkbox :model-value="i.selected" @change="(selected)=>selChange(i,selected)"/>
               </td>
               <td>
                 <div class="goods">

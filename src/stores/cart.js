@@ -15,13 +15,18 @@ export const getCartStore = defineStore('cart',()=>{
     }
     }
     const cartdelate = (id) =>{
-       /* const xid =  cartList.value.findIndex((item)=>item.skuId === id)
+       /* const xid =  cartList.value.findIndex((item)=>item.skuId === id)  //findIndex返回索引
        cartList.value.splice(xid,1) */
        cartList.value = cartList.value.filter((item)=>item.skuId !== id)
+    }
+    const cartChange = (id,selected)=>{
+        const item = cartList.value.find((item) => item.skuId === id)   //find返回元素
+        item.selected = selected
     }
     const allCount =computed(()=>cartList.value.reduce((a,c)=>a+c.count,0)) 
     const allPrice =computed(()=>cartList.value.reduce((a,c)=>a+c.count*c.price,0)) 
     return{
+        cartChange,
         allCount,
         allPrice,
         cartList,
