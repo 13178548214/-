@@ -6,6 +6,10 @@ function selChange(i,selected){
  cartStore.cartChange(i.skuId,selected)
  console.log(i);
 }
+
+function allChange(selected){
+  cartStore.cartList.forEach((item)=>item.selected = selected)
+}
 </script>
 
 <template>
@@ -16,7 +20,7 @@ function selChange(i,selected){
           <thead>
             <tr>
               <th width="120">
-                <el-checkbox/>
+                <el-checkbox :model-value="cartStore.isAll" @change="allChange"/>
               </th>
               <th width="400">商品信息</th>
               <th width="220">单价</th>

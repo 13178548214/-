@@ -23,10 +23,12 @@ export const getCartStore = defineStore('cart',()=>{
         const item = cartList.value.find((item) => item.skuId === id)   //find返回元素
         item.selected = selected
     }
+    const isAll = computed(()=>cartList.value.every((item)=>item.selected))
     const allCount =computed(()=>cartList.value.reduce((a,c)=>a+c.count,0)) 
     const allPrice =computed(()=>cartList.value.reduce((a,c)=>a+c.count*c.price,0)) 
     return{
         cartChange,
+        isAll,
         allCount,
         allPrice,
         cartList,
