@@ -43,6 +43,10 @@ export const getCartStore = defineStore('cart',()=>{
         const item = cartList.value.find((item) => item.skuId === id)   //find返回元素
         item.selected = selected
     }
+    const clearCart = ()=>{
+        cartList.value = []
+        console.log(1);
+    }
      
     const newCartList =computed(()=>cartList.value.filter(item=>item.selected))
     const isNeed = computed(()=>newCartList.value.reduce((a,c)=>a+c.count,0))
@@ -58,6 +62,7 @@ export const getCartStore = defineStore('cart',()=>{
         allCount,
         allPrice,
         cartList,
+        clearCart,
         cartChange,
         cartAdd,
         cartdelate

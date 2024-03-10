@@ -17,13 +17,12 @@ export const getCartListAPI = ()=>{
     })
 }
 
-export const deleteCartList = (xid)=>{
-    console.log(1);
+export const deleteCartList = (ids)=>{
     return httpInstance({
         url:'/member/cart',
         method:'DELETE',
         data:{
-            xid
+            ids
         }
     }
 )
