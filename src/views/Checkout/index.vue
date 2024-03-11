@@ -1,6 +1,11 @@
 <script setup>
 import { getCheckoutAPI } from '@/apis/checkout';
+import { creatOrderAPI } from '@/apis/checkout';
+import {getCartStore} from '@/stores/cart'
 import {ref,onMounted} from 'vue'
+import { useRouter } from 'vue-router';
+const cartStore = getCartStore()
+const router = useRouter()
 const checkInfo = ref({})
 const curAddress = ref({})  // 地址对象
 const getCheckout = async()=>{
@@ -10,6 +15,41 @@ const getCheckout = async()=>{
    curAddress.value = item
 }
 
+const showAdress = ref(false)
+
+const activeAddres = ref({})
+const switchAddress = (item)=>{
+  activeAddres.value = item
+}
+
+const confirm = ()=>{
+  curAddress.value = activeAddres.value
+  showAdress.value = false
+}
+
+const creatOrder=async()=>{
+  const res = await creatOrderAPI({
+    deliveryTimeType: 1,
+    payType: 1,
+    payChannel: 1,
+    buyerMessage: '',
+    goods: checkInfo.value.goods.map(item => {
+      return {
+        skuId: item.skuId,
+        count: item.count
+      }
+    }),
+    addressId: curAddress.value.id
+})
+const OrderId = res.result.id
+router.push({
+  path:'pay',
+  query:{
+    id:OrderId
+  }
+})
+cartStore.updatedList()
+}
 onMounted(()=>getCheckout())
 
 </script>
@@ -31,7 +71,7 @@ onMounted(()=>getCheckout())
               </ul>
             </div>
             <div class="action">
-              <el-button size="large" @click="toggleFlag = true">切换地址</el-button>
+              <el-button size="large" @click="showAdress = true">切换地址</el-button>
               <el-button size="large" @click="addFlag = true">添加地址</el-button>
             </div>
           </div>
@@ -106,12 +146,29 @@ onMounted(()=>getCheckout())
         </div>
         <!-- 提交订单 -->
         <div class="submit">
-          <el-button type="primary" size="large" >提交订单</el-button>
+          <el-button type="primary" size="large" @click="creatOrder">提交订单</el-button>
         </div>
       </div>
     </div>
   </div>
   <!-- 切换地址 -->
+  <el-dialog v-model="showAdress" title="切换收货地址" width="30%" center>
+  <div class="addressWrapper">
+    <div class="text item" v-for="item in checkInfo.userAddresses" :class="{ active: activeAddres.id === item.id}" :key="item.id" @click="switchAddress(item)">
+      <ul>
+      <li><span>收<i />货<i />人：</span>{{ item.receiver }} </li>
+      <li><span>联系方式：</span>{{ item.contact }}</li>
+      <li><span>收货地址：</span>{{ item.fullLocation + item.address }}</li>
+      </ul>
+    </div>
+  </div>
+  <template #footer>
+    <span class="dialog-footer">
+      <el-button>取消</el-button>
+      <el-button type="primary" @click="confirm">确定</el-button>
+    </span>
+  </template>
+</el-dialog>
   <!-- 添加地址 -->
 </template>
 
