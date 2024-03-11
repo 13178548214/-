@@ -1,18 +1,18 @@
 <script setup>
-import { getCategoryAPI } from '@/apis/layout';
-import {onMounted,ref} from 'vue'
+/* import { getCategoryAPI } from '@/apis/layout';
+import {onMounted,ref} from 'vue' */
 import HeaderCar from '@/views/Layout/components/HeaderCar.vue'
 import LayoutHeaderUI from './LayoutHeaderUI.vue';
-const CategoryList = ref([])
+/* const CategoryList = ref([]) */
 
-const getCategory = async() =>{
+/* const getCategory = async() =>{
  const res = await getCategoryAPI()
  CategoryList.value = res.result
-}
+} */
 
-onMounted(() => {
+/* onMounted(() => {
   getCategory()
-})
+}) */
 </script>
 
 <template>
