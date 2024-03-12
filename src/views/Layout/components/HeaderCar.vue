@@ -4,6 +4,7 @@ import {getCartStore} from '@/stores/cart'
 const cartStore = getCartStore()
 </script>
 
+
 <template>
   <div class="cart">
     <a class="curr" href="javascript:;">
