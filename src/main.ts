@@ -10,3 +10,5 @@ export function createApp() {
     app,
   }
 }
+
+export * from './stores/modules/member'

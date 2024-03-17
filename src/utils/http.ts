@@ -9,7 +9,7 @@ TODO:
     3.添加小程序端请求头标识
     4.添加 token 请求头标识
 */
-import { useMemberStore } from '@/stores'
+import { useMemberStore } from '@/stores/index'
 
 //一个基础地址
 const baseURL = 'https://pcapi-xiaotuxian-front-devtest.itheima.net'
@@ -31,10 +31,11 @@ const httpInterceptor = {
     }
     // 添加 token 请求头标识
     const memberStore = useMemberStore()
-    const token = memberStore.profile.token
+    const token = memberStore.profile?.token
     if (token) {
       options.header.Authorization = token
     }
+    console.log(options)
   },
 }
 

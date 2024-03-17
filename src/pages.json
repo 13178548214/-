@@ -7,6 +7,9 @@
 			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
 		}
 	},
+  "scripts":{
+   "build":"webpack --progress --hide-modules --config webpack.config.js"
+  },
   "pages": [
     //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
     {
