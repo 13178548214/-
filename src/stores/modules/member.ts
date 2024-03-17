@@ -27,6 +27,16 @@ export const useMemberStore = defineStore(
   },
   // TODO: 持久化
   {
-    persist: true,
+    //相当于直接将数据传到了本地储存里
+    persist: {
+      storage: {
+        setItem(key, value) {
+          uni.setStorageSync(key, value)
+        },
+        getItem(key) {
+          return uni.getStorageSync(key)
+        },
+      },
+    },
   },
 )
