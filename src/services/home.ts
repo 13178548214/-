@@ -2,6 +2,8 @@ import type { BannerItem } from '@/types/home'
 import type { CategoryItem } from '@/types/home'
 import type { HotItem } from '@/types/home'
 import { http } from '@/utils/http'
+import type { PageResult } from '@/types/Global'
+import type { GuessItem } from '@/types/home'
 
 //轮播图·
 export const getHomeBannerAPI = (distributionSite = 1) => {
@@ -35,7 +37,7 @@ export const getHomeHotAPI = () => {
 //猜你喜欢
 // /home/goods/guessLike
 export const getHomeGuessLikeAPI = () => {
-  return http({
+  return http<PageResult<GuessItem>>({
     url: '/home/goods/guessLike',
     method: 'GET',
   })
