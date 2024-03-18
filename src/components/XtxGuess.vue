@@ -2,12 +2,21 @@
 import { getHomeGuessLikeAPI } from '@/services/home'
 import type { GuessItem } from '@/types/home'
 import { ref, onMounted } from 'vue'
+import type { PagePrams } from '@/types/Global'
 const guessList = ref<GuessItem[]>([])
+
+const pagePrams: Required<PagePrams> = {
+  page: 1,
+  pageSize: 10,
+}
 const getHomeGuessLike = async () => {
-  const res = await getHomeGuessLikeAPI()
-  guessList.value = res.result.items
+  const res = await getHomeGuessLikeAPI(pagePrams)
+  guessList.value.push(...res.result.items)
+  pagePrams.page++
 }
 onMounted(() => getHomeGuessLike())
+
+defineExpose({ getmore: getHomeGuessLike })
 </script>
 
 <template>
