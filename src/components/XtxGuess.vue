@@ -1,5 +1,10 @@
 <script setup lang="ts">
-//
+import { getHomeGuessLikeAPI } from '@/services/home'
+import { ref, onMounted } from 'vue'
+const getHomeGuessLike = async () => {
+  const res = await getHomeGuessLikeAPI()
+}
+onMounted(() => getHomeGuessLike())
 </script>
 
 <template>

@@ -3,6 +3,7 @@ import type { CategoryItem } from '@/types/home'
 import type { HotItem } from '@/types/home'
 import { http } from '@/utils/http'
 
+//轮播图·
 export const getHomeBannerAPI = (distributionSite = 1) => {
   return http<BannerItem[]>({
     url: '/home/banner',
@@ -13,6 +14,7 @@ export const getHomeBannerAPI = (distributionSite = 1) => {
   })
 }
 
+//前台展示
 // /home/category/mutli
 export const getHomeCategoryAPI = () => {
   return http<CategoryItem[]>({
@@ -21,10 +23,20 @@ export const getHomeCategoryAPI = () => {
   })
 }
 
+//热门推荐
 // /home/hot/mutli
 export const getHomeHotAPI = () => {
   return http<HotItem[]>({
     url: '/home/hot/mutli',
+    method: 'GET',
+  })
+}
+
+//猜你喜欢
+// /home/goods/guessLike
+export const getHomeGuessLikeAPI = () => {
+  return http({
+    url: '/home/goods/guessLike',
     method: 'GET',
   })
 }
