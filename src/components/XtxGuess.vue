@@ -6,12 +6,23 @@ import type { PagePrams } from '@/types/Global'
 const guessList = ref<GuessItem[]>([])
 
 const pagePrams: Required<PagePrams> = {
-  page: 1,
+  page: 30,
   pageSize: 10,
 }
+const finish = ref(false)
 const getHomeGuessLike = async () => {
+  if (finish.value === true) {
+    return uni.showToast({
+      title: '没有更多数据了~',
+      icon: 'none',
+    })
+  }
   const res = await getHomeGuessLikeAPI(pagePrams)
-  guessList.value.push(...res.result.items)
+  if (pagePrams.page < res.result.pages) {
+    guessList.value.push(...res.result.items)
+  } else {
+    finish.value = true
+  }
   pagePrams.page++
 }
 onMounted(() => getHomeGuessLike())
@@ -39,7 +50,7 @@ defineExpose({ getmore: getHomeGuessLike })
       </view>
     </navigator>
   </view>
-  <view class="loading-text"> 正在加载... </view>
+  <view class="loading-text"> {{ finish ? '没有更多数据了~' : '加载更多' }} </view>
 </template>
 
 <style lang="scss">
