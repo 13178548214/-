@@ -6,7 +6,7 @@ import type { PageParams } from '@/types/Global'
 const guessList = ref<GuessItem[]>([])
 
 const pagePrams: Required<PageParams> = {
-  page: 30,
+  page: 1,
   pageSize: 10,
 }
 const finish = ref(false)
@@ -25,9 +25,15 @@ const getHomeGuessLike = async () => {
   }
   pagePrams.page++
 }
+//重置数据
+const resData = () => {
+  pagePrams.page = 1
+  guessList.value = []
+  finish.value = false
+}
 onMounted(() => getHomeGuessLike())
 
-defineExpose({ getmore: getHomeGuessLike })
+defineExpose({ getmore: getHomeGuessLike, resData })
 </script>
 
 <template>
