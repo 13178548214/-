@@ -11,6 +11,7 @@ import type { HotItem } from '@/types/home'
 import HotPanel from './components/HotPanel.vue'
 import { getHomeHotAPI } from '@/services/home'
 import type { XtxGuessInstance } from '@/types/component'
+import Pageskeleton from './components/Pageskeleton.vue'
 
 //获取轮播图数据
 const homeBannerList = ref<BannerItem[]>([])
@@ -34,6 +35,7 @@ const getHomeHot = async () => {
   hotList.value = res.result
 }
 
+//加载更多
 const guess = ref<XtxGuessInstance>()
 const onScrolltolower = () => {
   guess.value?.getmore()
@@ -41,6 +43,7 @@ const onScrolltolower = () => {
 
 const isTriggered = ref(false)
 
+//下拉刷新数据
 const onRefresherrefresh = async () => {
   isTriggered.value = true
   guess.value?.resData()
@@ -49,8 +52,10 @@ const onRefresherrefresh = async () => {
   isTriggered.value = false
 }
 
-onLoad(() => {
-  getHomeBanner(), getHomeCategory(), getHomeHot()
+const isLoding = ref(true)
+onLoad(async () => {
+  await Promise.all([getHomeBanner(), getHomeCategory(), getHomeHot()])
+  isLoding.value = false
 })
 </script>
 
@@ -66,14 +71,17 @@ onLoad(() => {
     class="scool-view"
     scroll-y
   >
-    <!-- 轮播图展示 -->
-    <XtxSwiper :list="homeBannerList" />
-    <!-- 前台展示 -->
-    <CategoryPanel :list="categoryList" />
-    <!-- 热门推荐 -->
-    <HotPanel :list="hotList" />
-    <!-- 猜你喜欢 -->
-    <XtxGuess ref="guess" />
+    <Pageskeleton v-if="isLoding" />
+    <template v-else>
+      <!-- 轮播图展示 -->
+      <XtxSwiper :list="homeBannerList" />
+      <!-- 前台展示 -->
+      <CategoryPanel :list="categoryList" />
+      <!-- 热门推荐 -->
+      <HotPanel :list="hotList" />
+      <!-- 猜你喜欢 -->
+      <XtxGuess ref="guess" />
+    </template>
   </scroll-view>
 </template>
 
