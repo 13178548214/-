@@ -1,9 +1,9 @@
 import type { PageParams } from '@/types/global'
-import type { HotItem } from '@/types/home'
+import type { HotResult } from '@/types/hot'
 import { http } from '@/utils/http'
 
 export const getHotRecommentAPI = (url: string, data?: PageParams & { subType: string }) => {
-  return http<HotItem>({
+  return http<HotResult>({
     method: 'GET',
     url,
     data,
