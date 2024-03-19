@@ -25,18 +25,47 @@ uni.setNavigationBarTitle({ title: currentUrl!.title })
 const bannerPicture = ref('')
 
 //定义推荐选项
-const subTypes = ref<SubTypeItem[]>([])
+const subTypes = ref<(SubTypeItem & { finish?: boolean })[]>([])
 
 //定义下标
 const activeIndex = ref(0)
 
 //获取数据
 const getHotRecomment = async () => {
-  const res = await getHotRecommentAPI(currentUrl!.url)
+  const res = await getHotRecommentAPI(currentUrl!.url, {
+    //技巧：环境变量，开发环境修改初始页面方便测试分页结束
+    page: import.meta.env.DEV ? 30 : 1,
+    pageSize: 10,
+  })
   //初始化封面图
   bannerPicture.value = res.result.bannerPicture
   //初始化推荐选项
   subTypes.value = res.result.subTypes
+}
+
+//触底触发
+const onScrolltolower = async () => {
+  //获取当前选项
+  const currentSubType = subTypes.value[activeIndex.value]
+  if (currentSubType.goodsItems.page < currentSubType.goodsItems.pages) {
+    //当前选项的页码累加
+    currentSubType.goodsItems.page++
+  } else {
+    //标记已结束
+    currentSubType.finish = true
+    //提示已结束
+    return uni.showToast({ icon: 'none', title: '没有更多数据了~' })
+  }
+  //重新获取数据
+  const res = await getHotRecommentAPI(currentUrl!.url, {
+    subType: currentSubType.id,
+    page: currentSubType.goodsItems.page,
+    pageSize: currentSubType.goodsItems.pageSize,
+  })
+  //提取新数据
+  const newCurrentSubType = res.result.subTypes[activeIndex.value]
+  //渲染新数据
+  currentSubType.goodsItems.items = [...newCurrentSubType.goodsItems.items]
 }
 
 onLoad(() => {
@@ -68,6 +97,7 @@ onLoad(() => {
       v-for="(item, index) in subTypes"
       :key="item.id"
       v-show="index === activeIndex"
+      @scrolltolower="onScrolltolower"
     >
       <view class="goods">
         <navigator
@@ -85,7 +115,7 @@ onLoad(() => {
           </view>
         </navigator>
       </view>
-      <view class="loading-text">正在加载...</view>
+      <view class="loading-text">{{ item.finish ? '已经没有更多数据了' : '加载更多' }}</view>
     </scroll-view>
   </view>
 </template>
