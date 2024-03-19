@@ -39,6 +39,15 @@ const onScrolltolower = () => {
   guess.value?.getmore()
 }
 
+const isTriggered = ref(false)
+
+const onRefresherrefresh = async () => {
+  isTriggered.value = true
+  /* await new Promise(() => [getHomeBanner(), getHomeHot(), getHomeCategory()]) 也可*/
+  await Promise.all([getHomeBanner(), getHomeHot(), getHomeCategory()])
+  isTriggered.value = false
+}
+
 onLoad(() => {
   getHomeBanner(), getHomeCategory(), getHomeHot()
 })
@@ -48,7 +57,14 @@ onLoad(() => {
   <!-- 顶部导航栏 -->
   <CustomNavbar />
   <!-- 为了固定顶部导航栏不动 -->
-  <scroll-view scroll-y class="scool-view" @scrolltolower="onScrolltolower">
+  <scroll-view
+    refresher-enabled
+    @refresherrefresh="onRefresherrefresh"
+    :refresher-triggered="isTriggered"
+    @scrolltolower="onScrolltolower"
+    class="scool-view"
+    scroll-y
+  >
     <!-- 轮播图展示 -->
     <XtxSwiper :list="homeBannerList" />
     <!-- 前台展示 -->
