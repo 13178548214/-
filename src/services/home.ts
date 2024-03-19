@@ -2,9 +2,9 @@ import type { BannerItem } from '@/types/home'
 import type { CategoryItem } from '@/types/home'
 import type { HotItem } from '@/types/home'
 import { http } from '@/utils/http'
-import type { PageResult } from '@/types/Global'
+import type { PageResult } from '@/types/global'
 import type { GuessItem } from '@/types/home'
-import type { PageParams } from '@/types/Global'
+import type { PageParams } from '@/types/global'
 
 //轮播图·
 export const getHomeBannerAPI = (distributionSite = 1) => {
