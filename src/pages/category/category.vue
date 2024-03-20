@@ -76,7 +76,7 @@ onLoad(async () => {
                 :key="goods.id"
                 class="goods"
                 hover-class="none"
-                :url="`/pages/goods/goods?id=${goods.id}`"
+                :url="`/pages/goods/index?id=${goods.id}`"
               >
                 <image class="image" :src="goods.picture"></image>
                 <view class="name ellipsis">{{ goods.name }}</view>
