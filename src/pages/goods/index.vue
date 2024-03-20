@@ -34,6 +34,12 @@ const onTapImage = (url: string) => {
   })
 }
 
+//找到弹出层
+const popup = ref<{
+  open: (type?: UniHelper.UniPopup) => {}
+  close: () => {}
+}>()
+
 onLoad(() => {
   getGoodsDetail()
 })
@@ -142,11 +148,18 @@ onLoad(() => {
         <text class="icon-cart"></text>购物车
       </navigator>
     </view>
-    <view class="buttons">
+    <view class="buttons" @tap="popup?.open()">
       <view class="addcart"> 加入购物车 </view>
       <view class="buynow"> 立即购买 </view>
     </view>
   </view>
+
+  <!-- 弹出层 -->
+  <uni-popup ref="popup" type="bottom" background-color="#fff">
+    <view>内容1</view>
+    <view>内容2</view>
+    <button @tap="popup?.close()">关闭弹层</button>
+  </uni-popup>
 </template>
 
 <style lang="scss">
