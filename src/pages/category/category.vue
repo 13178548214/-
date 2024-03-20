@@ -5,6 +5,7 @@ import type { BannerItem } from '@/types/home'
 import { onLoad } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
 import type { CategoryTopItem } from '@/types/category'
+import pageSketoken from './components/pageSketoken.vue'
 const bannerList = ref<BannerItem[]>([])
 
 //获取轮播图数据
@@ -28,65 +29,70 @@ const subCategoryList = computed(() => {
   return categoryTopList.value[activeIndex.value]?.children || []
 })
 
-onLoad(() => {
-  getCategoryTop(), getBannerData()
+//判断是否加载完成
+const isLoding = ref(false)
+onLoad(async () => {
+  await Promise.all([getCategoryTop(), getBannerData()])
+  isLoding.value = true
 })
 </script>
 
 <template>
-  <view class="viewport">
-    <!-- 搜索框 -->
-    <view class="search">
-      <view class="input">
-        <text class="icon-search">女靴</text>
+  <template v-if="isLoding">
+    <view class="viewport">
+      <!-- 搜索框 -->
+      <view class="search">
+        <view class="input">
+          <text class="icon-search">女靴</text>
+        </view>
+      </view>
+      <!-- 分类 -->
+      <view class="categories">
+        <!-- 左侧：一级分类 -->
+        <scroll-view class="primary" scroll-y>
+          <view
+            v-for="(item, index) in categoryTopList"
+            :key="item.id"
+            class="item"
+            :class="{ active: index === activeIndex }"
+            @tap="activeIndex = index"
+          >
+            <text class="name"> {{ item.name }} </text>
+          </view>
+        </scroll-view>
+        <!-- 右侧：二级分类 -->
+        <scroll-view class="secondary" scroll-y>
+          <!-- 焦点图 -->
+          <XtxSwiper class="banner" :list="bannerList" />
+          <!-- 内容区域 -->
+          <view class="panel" v-for="item in subCategoryList" :key="item.id">
+            <view class="title">
+              <text class="name">{{ item.name }}</text>
+              <navigator class="more" hover-class="none">全部</navigator>
+            </view>
+            <view class="section">
+              <navigator
+                v-for="goods in item.goods"
+                :key="goods.id"
+                class="goods"
+                hover-class="none"
+                :url="`/pages/goods/goods?id=${goods.id}`"
+              >
+                <image class="image" :src="goods.picture"></image>
+                <view class="name ellipsis">{{ goods.name }}</view>
+                <view class="price">
+                  <text class="symbol">¥</text>
+                  <text class="number">{{ goods.price }}</text>
+                </view>
+              </navigator>
+            </view>
+          </view>
+        </scroll-view>
       </view>
     </view>
-    <!-- 分类 -->
-    <view class="categories">
-      <!-- 左侧：一级分类 -->
-      <scroll-view class="primary" scroll-y>
-        <view
-          v-for="(item, index) in categoryTopList"
-          :key="item.id"
-          class="item"
-          :class="{ active: index === activeIndex }"
-          @tap="activeIndex = index"
-        >
-          <text class="name"> {{ item.name }} </text>
-        </view>
-      </scroll-view>
-      <!-- 右侧：二级分类 -->
-      <scroll-view class="secondary" scroll-y>
-        <!-- 焦点图 -->
-        <XtxSwiper class="banner" :list="bannerList" />
-        <!-- 内容区域 -->
-        <view class="panel" v-for="item in subCategoryList" :key="item.id">
-          <view class="title">
-            <text class="name">{{ item.name }}</text>
-            <navigator class="more" hover-class="none">全部</navigator>
-          </view>
-          <view class="section">
-            <navigator
-              v-for="goods in item.goods"
-              :key="goods.id"
-              class="goods"
-              hover-class="none"
-              :url="`/pages/goods/goods?id=${goods.id}`"
-            >
-              <image class="image" :src="goods.picture"></image>
-              <view class="name ellipsis">{{ goods.name }}</view>
-              <view class="price">
-                <text class="symbol">¥</text>
-                <text class="number">{{ goods.price }}</text>
-              </view>
-            </navigator>
-          </view>
-        </view>
-      </scroll-view>
-    </view>
-  </view>
+  </template>
+  <pageSketoken v-else />
 </template>
-
 <style lang="scss">
 page {
   height: 100%;
