@@ -4,6 +4,8 @@ import { getGoodsDetailAPI } from '@/services/goods'
 import { onLoad } from '@dcloudio/uni-app'
 import type { GoodsResult } from '@/types/goods'
 import { ref } from 'vue'
+import addressPanle from '@/pages/goods/components/addressPanle.vue'
+import servicePanle from '@/pages/goods/components/servicePanle.vue'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -39,6 +41,15 @@ const popup = ref<{
   open: (type?: UniHelper.UniPopup) => {}
   close: () => {}
 }>()
+
+//定义一个弹出层名字
+const popupName = ref<'address' | 'service'>()
+
+//定义一个弹出方法
+const popupOpen = (name: typeof popupName.value) => {
+  popupName.value = name
+  popup.value?.open()
+}
 
 onLoad(() => {
   getGoodsDetail()
@@ -79,11 +90,11 @@ onLoad(() => {
           <text class="label">选择</text>
           <text class="text ellipsis"> 请选择商品规格 </text>
         </view>
-        <view class="item arrow">
+        <view class="item arrow" @tap="popupOpen('address')">
           <text class="label">送至</text>
           <text class="text ellipsis"> 请选择收获地址 </text>
         </view>
-        <view class="item arrow">
+        <view class="item arrow" @tap="popupOpen('service')">
           <text class="label">服务</text>
           <text class="text ellipsis"> 无忧退 快速退款 免费包邮 </text>
         </view>
@@ -148,7 +159,7 @@ onLoad(() => {
         <text class="icon-cart"></text>购物车
       </navigator>
     </view>
-    <view class="buttons" @tap="popup?.open()">
+    <view class="buttons">
       <view class="addcart"> 加入购物车 </view>
       <view class="buynow"> 立即购买 </view>
     </view>
@@ -156,8 +167,8 @@ onLoad(() => {
 
   <!-- 弹出层 -->
   <uni-popup ref="popup" type="bottom" background-color="#fff">
-    <view>内容1</view>
-    <view>内容2</view>
+    <addressPanle v-if="popupName === 'address'" @close="popup?.close" />
+    <servicePanle v-if="popupName === 'service'" @close="popup?.close" />
     <button @tap="popup?.close()">关闭弹层</button>
   </uni-popup>
 </template>
