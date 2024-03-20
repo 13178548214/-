@@ -7,15 +7,33 @@ import { ref } from 'vue'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
+
+//接受一个参数
 const query = defineProps<{
   id: string
 }>()
 
+//定义一个空对象
 const goods = ref<GoodsResult>()
+//调取对应的API
 const getGoodsDetail = async () => {
   const res = await getGoodsDetailAPI(query.id)
   goods.value = res.result
 }
+//当下标变化时
+const activeIndex = ref(0)
+const onChange: UniHelper.SwiperOnChange = (ev) => {
+  activeIndex.value = ev.detail!.current
+}
+
+//点击切大图
+const onTapImage = (url: string) => {
+  uni.previewImage({
+    current: url,
+    urls: goods.value!.mainPictures,
+  })
+}
+
 onLoad(() => {
   getGoodsDetail()
 })
@@ -27,15 +45,15 @@ onLoad(() => {
     <view class="goods">
       <!-- 商品主图 -->
       <view class="preview">
-        <swiper circular>
-          <swiper-item v-for="item in goods?.mainPictures" :key="item">
+        <swiper circular @change="onChange">
+          <swiper-item v-for="item in goods?.mainPictures" :key="item" @tap="onTapImage(item)">
             <image mode="aspectFill" :src="item" />
           </swiper-item>
         </swiper>
         <view class="indicator">
-          <text class="current">1</text>
+          <text class="current">{{ activeIndex + 1 }}</text>
           <text class="split">/</text>
-          <text class="total">5</text>
+          <text class="total">{{ goods?.mainPictures.length }}</text>
         </view>
       </view>
 
