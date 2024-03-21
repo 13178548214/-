@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app'
 import { postLoginAPI } from '@/services/login'
+import { postLoginSimpleAPI } from '@/services/login'
+import { useMemberStore } from '@/stores'
+import type { LoginResult } from '@/types/member'
 
 //登录凭证
 let code = ''
@@ -10,17 +13,34 @@ onLoad(async () => {
 })
 
 //获取手机号码
-const onGetPhoneNumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
+const onGetPhonenumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
   const encryptedData = ev.detail!.encryptedData!
   const iv = ev.detail!.iv!
   //小程序登录
   const res = await postLoginAPI({ code, encryptedData, iv })
-  //成功提示
-  uni.showToast({
-    title: '登录成功',
-    icon: 'none',
-  })
+  loginSuccess(res.result)
 }
+
+//获得一个虚拟的手机号
+const onGetPhoneNumberSimple = async () => {
+  const res = await postLoginSimpleAPI('13178548214')
+  loginSuccess(res.result)
+}
+
+//保存用户数据
+const loginSuccess = (profile: LoginResult) => {
+  //保存
+  const memberStore = useMemberStore()
+  memberStore.setProfile(profile)
+  //提醒用户登录成功
+  uni.showToast({ title: '登录成功', icon: 'none' })
+  //跳转到我的
+  setTimeout(() => {
+    uni.switchTab({ url: '/pages/my/my' })
+  }, 500)
+}
+
+//创建一个虚拟的手机号
 </script>
 
 <template>
@@ -37,7 +57,7 @@ const onGetPhoneNumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
       <!-- <button class="button phone">登录</button> -->
 
       <!-- 小程序端授权登录 -->
-      <button class="button phone" open-type="getPhoneNumber" @getphonenumber="onGetPhoneNumber">
+      <button class="button phone" open-type="getPhoneNumber" @getphonenumber="onGetPhonenumber">
         <text class="icon icon-phone"></text>
         手机号快捷登录
       </button>
@@ -47,7 +67,7 @@ const onGetPhoneNumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
         </view>
         <view class="options">
           <!-- 通用模拟登录 -->
-          <button>
+          <button @tap="onGetPhoneNumberSimple">
             <text class="icon icon-phone">模拟快捷登录</text>
           </button>
         </view>
