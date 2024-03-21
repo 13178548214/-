@@ -10,7 +10,7 @@ import type { CategoryItem } from '@/types/home'
 import type { HotItem } from '@/types/home'
 import HotPanel from './components/HotPanel.vue'
 import { getHomeHotAPI } from '@/services/home'
-import type { XtxGuessInstance } from '@/types/component'
+import { useGuessList } from '@/composables/index'
 import Pageskeleton from './components/Pageskeleton.vue'
 
 //获取轮播图数据
@@ -36,11 +36,7 @@ const getHomeHot = async () => {
 }
 
 //加载更多
-const guess = ref<XtxGuessInstance>()
-const onScrolltolower = () => {
-  guess.value?.getmore()
-}
-
+const { guess, onScrolltolower } = useGuessList()
 const isTriggered = ref(false)
 
 //下拉刷新数据
