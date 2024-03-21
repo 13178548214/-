@@ -113,13 +113,22 @@
 					"style": {
 						"navigationBarTitleText": "设置"
 					}
+				},
+				{
+					"path": "profile/profile",
+					"style": {
+						"navigationBarTitleText": "个人信息"
+					}
 				}
 			]
 		}
 	],
-  "preloadRule": {
-    "pages/my/my":{
-      "network": "all",
-      "packages": ["pagesMember"]
-  }
-}}
+	"preloadRule": {
+		"pages/my/my": {
+			"network": "all",
+			"packages": [
+				"pagesMember"
+			]
+		}
+	}
+}
