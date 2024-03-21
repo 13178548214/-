@@ -12,7 +12,7 @@
 	},
 	"pages": [
 		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-    {
+		{
 			"path": "pages/login/login",
 			"style": {
 				"navigationBarTitleText": "登录"
@@ -29,8 +29,8 @@
 		{
 			"path": "pages/my/my",
 			"style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "white",
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white",
 				"navigationBarTitleText": "我的"
 			}
 		},
@@ -103,5 +103,23 @@
 				"selectedIconPath": "static/tabs/user_selected.png"
 			}
 		]
-	}
-}
+	},
+	"subPackages": [
+		{
+			"root": "pagesMember",
+			"pages": [
+				{
+					"path": "setting/setting",
+					"style": {
+						"navigationBarTitleText": "设置"
+					}
+				}
+			]
+		}
+	],
+  "preloadRule": {
+    "pages/my/my":{
+      "network": "all",
+      "packages": ["pagesMember"]
+  }
+}}
