@@ -1,6 +1,107 @@
+<!-- eslint-disable no-undef -->
 <script setup lang="ts">
+import { getMemberProfileAPI, putMemberProfileAPI } from '@/services/profile'
+import type { ProfileDetail } from '@/types/member'
+import { onLoad } from '@dcloudio/uni-app'
+import { ref } from 'vue'
+import { useMemberStore } from '@/stores'
+import type { Gender } from '@/types/member'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
+
+//个人信息
+const memberStore = useMemberStore()
+
+//发送请求,获得个人信息  要能够修改信息并且一开始是空集
+const profile = ref({} as ProfileDetail)
+const getMemberProfile = async () => {
+  const res = await getMemberProfileAPI()
+  profile.value = res.result
+}
+
+const onChangeAvatar = () => {
+  //选择图片或拍照上传
+  uni.chooseMedia({
+    //文件数量
+    count: 1,
+    //文件类型
+    mediaType: ['image'],
+    //成功后的回调函数
+    success: (res) => {
+      const { tempFilePath } = res.tempFiles[0]
+      uni.uploadFile({
+        url: '/member/profile/avatar',
+        name: 'file',
+        filePath: tempFilePath,
+        success: (res) => {
+          if (res.statusCode === 200) {
+            profile.value!.avatar = JSON.parse(res.data).result.data
+            //更新store数据
+            memberStore.profile!.avatar = JSON.parse(res.data).result.data
+            uni.showToast({
+              title: '更换成功',
+              icon: 'success',
+            })
+          } else {
+            uni.showToast({
+              title: '更换失败',
+              icon: 'error',
+            })
+          }
+        },
+      })
+    },
+  })
+}
+
+//修改性别
+const onGenderChange: UniHelper.RadioGroupOnChange = (ev) => {
+  profile.value.gender = ev.detail.value as Gender
+}
+
+//修改生日
+const onBirthdayChange: UniHelper.DatePickerOnChange = (ev) => {
+  profile.value.birthday = ev.detail.value
+}
+
+//修改地址
+let fullLocationCode: [string, string, string] = ['', '', '']
+const onFullLocationChange: UniHelper.RegionPickerOnChange = (ev) => {
+  profile.value.fullLocation = ev.detail.value.join(' ')
+  fullLocationCode = ev.detail.code!
+}
+
+/* 点击保存信息 */
+const onSubmit = async () => {
+  //修改个人信息
+  const [provinceCode, cityCode, countyCode] = fullLocationCode || []
+  const res = await putMemberProfileAPI({
+    nickname: profile.value.nickname,
+    gender: profile.value.gender,
+    birthday: profile.value.birthday,
+    provinceCode,
+    cityCode,
+    countyCode,
+    profession: profile.value.profession,
+  })
+
+  //更新store数据
+  memberStore.profile!.nickname = profile.value.nickname
+
+  //成功提示
+  uni.showToast({
+    title: '保存成功',
+    icon: 'success',
+  })
+  //跳回上一页
+  setTimeout(() => {
+    uni.navigateBack({})
+  }, 500)
+}
+
+onLoad(() => {
+  getMemberProfile()
+})
 </script>
 
 <template>
@@ -13,8 +114,8 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
     <!-- 头像 -->
     <view class="avatar">
       <view class="avatar-content">
-        <image class="image" src=" " mode="aspectFill" />
-        <text class="text">点击修改头像</text>
+        <image class="image" :src="profile?.avatar" mode="aspectFill" />
+        <text class="text" @tap="onChangeAvatar">点击修改头像</text>
       </view>
     </view>
     <!-- 表单 -->
@@ -23,21 +124,21 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
       <view class="form-content">
         <view class="form-item">
           <text class="label">账号</text>
-          <text class="account">账号名</text>
+          <text class="account">{{ profile?.account }}</text>
         </view>
         <view class="form-item">
           <text class="label">昵称</text>
-          <input class="input" type="text" placeholder="请填写昵称" value="" />
+          <input class="input" type="text" placeholder="请填写昵称" v-model="profile.nickname" />
         </view>
         <view class="form-item">
           <text class="label">性别</text>
-          <radio-group>
+          <radio-group @change="onGenderChange">
             <label class="radio">
-              <radio value="男" color="#27ba9b" :checked="true" />
+              <radio value="男" color="#27ba9b" :checked="profile?.gender === '男'" />
               男
             </label>
             <label class="radio">
-              <radio value="女" color="#27ba9b" :checked="false" />
+              <radio value="女" color="#27ba9b" :checked="profile?.gender === '女'" />
               女
             </label>
           </radio-group>
@@ -49,30 +150,37 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
             mode="date"
             start="1900-01-01"
             :end="new Date()"
-            value="2000-01-01"
+            :value="profile?.birthday"
+            @change="onBirthdayChange"
           >
-            <view v-if="false">2000-01-01</view>
-            <view class="placeholder" v-else>请选择日期</view>
+            <view v-if="profile?.birthday">{{ profile?.birthday }}</view>
+            <view class="placeholder" v-else>请选择生日日期</view>
           </picker>
         </view>
         <view class="form-item">
           <text class="label">城市</text>
-          <picker class="picker" mode="region" :value="['广东省', '广州市', '天河区']">
-            <view v-if="false">广东省广州市天河区</view>
+          <picker
+            class="picker"
+            mode="region"
+            :value="profile?.fullLocation?.split(' ')"
+            @change="onFullLocationChange"
+          >
+            <view v-if="profile?.fullLocation">{{ profile?.fullLocation }}</view>
             <view class="placeholder" v-else>请选择城市</view>
           </picker>
         </view>
         <view class="form-item">
           <text class="label">职业</text>
-          <input class="input" type="text" placeholder="请填写职业" value="" />
+          <input class="input" type="text" placeholder="请填写职业" v-model="profile.profession" />
         </view>
       </view>
       <!-- 提交按钮 -->
-      <button class="form-button">保 存</button>
+      <button class="form-button" @tap="onSubmit">保 存</button>
     </view>
   </view>
 </template>
 
+|
 <style lang="scss">
 page {
   background-color: #f4f4f4;
