@@ -14,9 +14,11 @@ const memberStore = useMemberStore()
 
 //发送请求,获得个人信息  要能够修改信息并且一开始是空集
 const profile = ref({} as ProfileDetail)
+let fullLocationCode: [string, string, string] = ['', '', '']
 const getMemberProfile = async () => {
   const res = await getMemberProfileAPI()
   profile.value = res.result
+  console.log(res.result.fullLocation)
 }
 
 const onChangeAvatar = () => {
@@ -65,7 +67,6 @@ const onBirthdayChange: UniHelper.DatePickerOnChange = (ev) => {
 }
 
 //修改地址
-let fullLocationCode: [string, string, string] = ['', '', '']
 const onFullLocationChange: UniHelper.RegionPickerOnChange = (ev) => {
   profile.value.fullLocation = ev.detail.value.join(' ')
   fullLocationCode = ev.detail.code!
@@ -74,7 +75,7 @@ const onFullLocationChange: UniHelper.RegionPickerOnChange = (ev) => {
 /* 点击保存信息 */
 const onSubmit = async () => {
   //修改个人信息
-  const [provinceCode, cityCode, countyCode] = fullLocationCode || []
+  const [provinceCode, cityCode, countyCode] = fullLocationCode
   const res = await putMemberProfileAPI({
     nickname: profile.value.nickname,
     gender: profile.value.gender,
