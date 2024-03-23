@@ -14,7 +14,7 @@ export const postMemberAddressAPI = (data: AddressParams) => {
 }
 
 /**
- * 获取收货地址列表
+ * 获取收货地址列表(用于渲染列表)
  */
 export const getMemberAddressAPI = () => {
   return http<AddressItem[]>({
@@ -24,12 +24,25 @@ export const getMemberAddressAPI = () => {
 }
 
 /**
- * 获取收货地址详情
+ * 获取收货地址详情(用于修改地址)
  * @param id 地址id(路径参数)
  */
 export const getMemberAddressByIdAPI = (id: string) => {
   return http<AddressItem>({
     method: 'GET',
     url: `/member/address/${id}`,
+  })
+}
+
+/**
+ * 修改收货地址
+ * @param id 地址id(路径参数)
+ * @param data 表单数据(请求体参数)
+ */
+export const putMemberAddressByIdAPI = (id: string, data: AddressParams) => {
+  return http({
+    method: 'PUT',
+    url: `/member/address/${id}`,
+    data,
   })
 }

@@ -27,7 +27,7 @@ onShow(() => {
               <view class="user">
                 {{ item.receiver }}
                 <text class="contact">{{ item.contact }}</text>
-                <text v-if="true" class="badge">默认</text>
+                <text v-if="item.isDefault" class="badge">默认</text>
               </view>
               <view class="locate">{{ item.fullLocation }} {{ item.address }} </view>
               <navigator
