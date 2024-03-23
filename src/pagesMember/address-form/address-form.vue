@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { postMemberAddressAPI } from '@/services/address'
+import { getMemberAddressByIdAPI, postMemberAddressAPI } from '@/services/address'
+import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
 // 获取页面参数
@@ -47,6 +48,18 @@ const onSubmit = async () => {
     uni.navigateBack()
   }, 500)
 }
+
+//修改表单
+const getMemberAddressById = async () => {
+  if (query.id) {
+    const res = await getMemberAddressByIdAPI(query.id)
+    Object.assign(form.value, res.result)
+  }
+}
+
+onLoad(() => {
+  getMemberAddressById()
+})
 </script>
 
 <template>
