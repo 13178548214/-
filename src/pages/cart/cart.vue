@@ -4,7 +4,7 @@ import { deleteMemberCartAPI, getMemberCartAPI, putMemberCartBySkuIdAPI } from '
 import { useMemberStore } from '@/stores'
 import type { CartItem } from '@/types/cart'
 import { onShow } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 //定义一个购物车数据
 const cartList = ref<CartItem[]>()
@@ -39,6 +39,36 @@ const onChangeCount = async (ev: InputNumberBoxEvent) => {
   await putMemberCartBySkuIdAPI(ev.index, { count: ev.value })
   //重新调用API
   getMemberCart()
+}
+
+//计算已选中的商品列表
+const selectedCartList = computed(() => {
+  return cartList.value?.filter((v) => v.selected)
+})
+
+//计算选中商品的总件数
+const selectedCartCount = computed(() => {
+  return selectedCartList.value?.reduce((sum, item) => sum + item.count, 0)
+})
+
+//计算选中商品的总价格
+const selectedCartPrice = computed(() => {
+  return selectedCartList.value?.reduce((sum, item) => sum + item.count * item.nowPrice, 0)
+})
+
+//结算画面
+const goToPay = () => {
+  if (selectedCartCount.value === 0) {
+    uni.showToast({
+      title: '请选择商品',
+      icon: 'none',
+    })
+  } else {
+    uni.showToast({
+      title: '正在建设',
+      icon: 'none',
+    })
+  }
 }
 
 //页面出现时重新获取数据并渲染
@@ -112,9 +142,11 @@ onShow(() => {
       <view class="toolbar">
         <text class="all" :class="{ checked: true }">全选</text>
         <text class="text">合计:</text>
-        <text class="amount">100</text>
+        <text class="amount">{{ selectedCartPrice }}</text>
         <view class="button-grounp">
-          <view class="button payment-button" :class="{ disabled: true }"> 去结算(10) </view>
+          <view class="button payment-button" :class="{ disabled: selectedCartCount === 0 }">
+            去结算({{ selectedCartCount }})
+          </view>
         </view>
       </view>
     </template>
