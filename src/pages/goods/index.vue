@@ -6,6 +6,11 @@ import type { GoodsResult } from '@/types/goods'
 import { ref } from 'vue'
 import addressPanle from '@/pages/goods/components/addressPanle.vue'
 import servicePanle from '@/pages/goods/components/servicePanle.vue'
+import type { SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
+import type { SkuPopupInstance } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
+import { computed } from 'vue'
+import type { SkuPopupEvent } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
+import { postMemberCartAPI } from '@/services/cart'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -21,6 +26,22 @@ const goods = ref<GoodsResult>()
 const getGoodsDetail = async () => {
   const res = await getGoodsDetailAPI(query.id)
   goods.value = res.result
+  // SKU组件所需格式
+  localdata.value = {
+    _id: res.result.id,
+    name: res.result.name,
+    goods_thumb: res.result.mainPictures[0],
+    spec_list: res.result.specs.map((v) => ({ name: v.name, list: v.values })),
+    sku_list: res.result.skus.map((v) => ({
+      _id: v.id,
+      goods_id: res.result.id,
+      goods_name: res.result.name,
+      image: v.picture,
+      price: v.price * 100, // 注意：需要乘以 100
+      stock: v.inventory,
+      sku_name_arr: v.specs.map((vv) => vv.valueName),
+    })),
+  }
 }
 //当下标变化时
 const activeIndex = ref(0)
@@ -51,12 +72,61 @@ const popupOpen = (name: typeof popupName.value) => {
   popup.value?.open()
 }
 
+//商品详情
+const localdata = ref({} as SkuPopupLocaldata)
+
+//是否显示SKU组件
+const isShowSku = ref(false)
+
+//展示出来的按钮模式
+enum SkuMode /* enum既能声明类型，同时也能定义数据 */ {
+  Both = 1,
+  Cart = 2,
+  Buy = 3,
+}
+//定义按钮模式
+let mode = ref<SkuMode>(SkuMode.Both)
+
+//定义一个控制模块的函数
+const openSkuMode = (val: SkuMode) => {
+  //展示组件
+  isShowSku.value = true
+  //组件按钮模式
+  mode.value = val
+}
+
+//找到组件实例
+const SkupopupRef = ref<SkuPopupInstance>()
+
+//控制展示出来的商品信息
+const goodsDetail = computed(() => {
+  return SkupopupRef.value?.selectArr?.join(' ').trim() || '请选择商品规格'
+})
+
+//添加购物车数据
+const onAddCart = async (ev: SkuPopupEvent) => {
+  await postMemberCartAPI({ skuId: ev._id, count: ev.buy_num })
+  uni.showToast({ title: '添加成功', icon: 'success' })
+  isShowSku.value = false
+}
+
 onLoad(() => {
   getGoodsDetail()
 })
 </script>
 
 <template>
+  <!-- 缺少localdata 数据就无法展示sku组件 要将数据传给组件 -->
+  <!-- 放在最上面是为了打开的时候能覆盖原本的商品详情 -->
+  <vk-data-goods-sku-popup
+    v-model="isShowSku"
+    :localdata="localdata"
+    :mode="mode"
+    add-cart-background-color="#FFA868"
+    buy-now-background-color="#27BA9B"
+    ref="SkupopupRef"
+    @add-cart="onAddCart"
+  />
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
     <view class="goods">
@@ -86,9 +156,10 @@ onLoad(() => {
 
       <!-- 操作面板 -->
       <view class="action">
-        <view class="item arrow">
+        <!-- isShowSku 决定了是否展示组件 -->
+        <view @tap="isShowSku = true" class="item arrow">
           <text class="label">选择</text>
-          <text class="text ellipsis"> 请选择商品规格 </text>
+          <text class="text ellipsis"> {{ goodsDetail }} </text>
         </view>
         <view class="item arrow" @tap="popupOpen('address')">
           <text class="label">送至</text>
@@ -160,8 +231,8 @@ onLoad(() => {
       </navigator>
     </view>
     <view class="buttons">
-      <view class="addcart"> 加入购物车 </view>
-      <view class="buynow"> 立即购买 </view>
+      <view class="addcart" @tap="openSkuMode(SkuMode.Cart)"> 加入购物车 </view>
+      <view class="buynow" @tap="openSkuMode(SkuMode.Buy)"> 立即购买 </view>
     </view>
   </view>
 

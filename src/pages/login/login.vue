@@ -23,7 +23,9 @@ const onGetPhonenumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
 
 //获得一个虚拟的手机号
 const onGetPhoneNumberSimple = async () => {
-  const res = await postLoginSimpleAPI('13178548214')
+  const res = await postLoginSimpleAPI(
+    '13178548214',
+  ) /* 此时最关键的是传了一个token 在res.result 里面，最终再通过参数传给保存数据的函数里，存到store里 */
   loginSuccess(res.result)
 }
 
@@ -37,6 +39,7 @@ const loginSuccess = (profile: LoginResult) => {
   //跳转到我的
   setTimeout(() => {
     uni.switchTab({ url: '/pages/my/my' })
+    /* uni.navigateBack() */
   }, 500)
 }
 
