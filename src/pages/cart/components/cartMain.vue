@@ -6,6 +6,7 @@ import { useMemberStore } from '@/stores'
 import type { CartItem } from '@/types/cart'
 import { onShow } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
+import { putMemberCartSelectedAPI } from '@/services/cart'
 
 //接受传回来的参数
 const show = defineProps<{
@@ -78,15 +79,37 @@ const goToPay = () => {
       icon: 'none',
     })
   } else {
-    uni.showToast({
-      title: '正在建设',
-      icon: 'none',
-    })
+    uni.navigateTo({ url: '/pagesOrder/creat/creat' })
   }
 }
 
 //滑到底部刷新
 const { guess, onScrolltolower } = useGuessList()
+
+//修改选中状态
+const changeSelected = (item: CartItem) => {
+  //前端数据
+  item.selected = !item.selected
+  //后端数据
+  putMemberCartBySkuIdAPI(item.skuId, { selected: item.selected })
+}
+
+//全选状态
+const isAllSelecteed = computed(() => {
+  return cartList.value?.length && cartList.value?.every((v) => v.selected)
+})
+
+//改变全选状态
+const changeAllSelected = () => {
+  //先找一个值承接全选状态
+  const aisAllSelected = !isAllSelecteed.value
+  //将列表里所有数据的选中状态改变
+  cartList.value?.forEach((v) => {
+    v.selected = aisAllSelected
+  })
+  //将数据传给后端
+  putMemberCartSelectedAPI({ selected: aisAllSelected })
+}
 
 //页面出现时重新获取数据并渲染
 onShow(() => {
@@ -114,7 +137,11 @@ onShow(() => {
             <!-- 商品信息 -->
             <view class="goods">
               <!-- 选中状态 -->
-              <text class="checkbox" :class="{ checked: item.selected }"></text>
+              <text
+                class="checkbox"
+                :class="{ checked: item.selected }"
+                @tap="changeSelected(item)"
+              ></text>
               <navigator
                 :url="`/pages/goods/goods?id=${item.id}`"
                 hover-class="none"
@@ -157,11 +184,15 @@ onShow(() => {
       </view>
       <!-- 吸底工具栏 -->
       <view class="toolbar" :style="{ paddingBottom: bottomHeight + 'px' }">
-        <text class="all" :class="{ checked: true }">全选</text>
+        <text class="all" :class="{ checked: isAllSelecteed }" @tap="changeAllSelected">全选</text>
         <text class="text">合计:</text>
         <text class="amount">{{ selectedCartPrice }}</text>
         <view class="button-grounp">
-          <view class="button payment-button" :class="{ disabled: selectedCartCount === 0 }">
+          <view
+            class="button payment-button"
+            :class="{ disabled: selectedCartCount === 0 }"
+            @tap="goToPay"
+          >
             去结算({{ selectedCartCount }})
           </view>
         </view>

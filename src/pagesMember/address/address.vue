@@ -3,6 +3,7 @@ import { deleteMemberAddressByIdAPI, getMemberAddressAPI } from '@/services/addr
 import type { AddressItem } from '@/types/address'
 import { onShow } from '@dcloudio/uni-app'
 import { ref } from 'vue'
+import { useAddressStore } from '@/stores/modules/address'
 
 const addressList = ref<AddressItem[]>([])
 const getMemberAddress = async () => {
@@ -25,6 +26,9 @@ const deleteMemberAddress = async (id: string) => {
   })
 }
 
+//获取store里地址信息
+const addressStore = useAddressStore()
+
 onShow(() => {
   getMemberAddress()
 })
@@ -37,7 +41,12 @@ onShow(() => {
       <view v-if="addressList.length" class="address">
         <uni-swipe-action class="address-list">
           <!-- 收货地址项 -->
-          <uni-swipe-action-item class="item" v-for="item in addressList" :key="item.id">
+          <uni-swipe-action-item
+            class="item"
+            v-for="item in addressList"
+            :key="item.id"
+            @tap="addressStore.changeAddress(item)"
+          >
             <view class="item-content">
               <view class="user">
                 {{ item.receiver }}
@@ -49,6 +58,7 @@ onShow(() => {
                 class="edit"
                 hover-class="none"
                 :url="`/pagesMember/address-form/address-form?id=${item.id}`"
+                @tap.stop="() => {}"
               >
                 修改
               </navigator>
