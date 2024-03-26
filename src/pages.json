@@ -40,12 +40,12 @@
 				"navigationBarTitleText": "购物车"
 			}
 		},
-    {
-      "path": "pages/cart/cart2",
+		{
+			"path": "pages/cart/cart2",
 			"style": {
 				"navigationBarTitleText": "购物车"
 			}
-    },
+		},
 		{
 			"path": "pages/category/category",
 			"style": {
@@ -137,7 +137,18 @@
 				{
 					"path": "address-form/address-form",
 					"style": {
-            "navigationBarTitleText":""
+						"navigationBarTitleText": ""
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesOrder",
+			"pages": [
+				{
+					"path": "creat/creat",
+					"style": {
+						"navigationBarTitleText": "创建"
 					}
 				}
 			]

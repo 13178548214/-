@@ -1,5 +1,5 @@
 <template>
-  <cartMain />
+  <cartMain :show="false" />
 </template>
 
 <script setup>

@@ -1,10 +1,24 @@
 <script setup lang="ts">
 import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/vk-data-input-number-box'
+import { useGuessList } from '@/composables'
 import { deleteMemberCartAPI, getMemberCartAPI, putMemberCartBySkuIdAPI } from '@/services/cart'
 import { useMemberStore } from '@/stores'
 import type { CartItem } from '@/types/cart'
 import { onShow } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
+
+//接受传回来的参数
+const show = defineProps<{
+  show: Boolean
+}>()
+
+//定义一个安全适配距离
+
+let bottomHeight = 0
+if (show.show) {
+  const { safeAreaInsets } = uni.getSystemInfoSync()
+  bottomHeight = safeAreaInsets!.bottom
+}
 
 //定义一个购物车数据
 const cartList = ref<CartItem[]>()
@@ -71,6 +85,9 @@ const goToPay = () => {
   }
 }
 
+//滑到底部刷新
+const { guess, onScrolltolower } = useGuessList()
+
 //页面出现时重新获取数据并渲染
 onShow(() => {
   if (memberStore.profile) {
@@ -80,7 +97,7 @@ onShow(() => {
 </script>
 
 <template>
-  <scroll-view scroll-y class="scroll-view">
+  <scroll-view scroll-y class="scroll-view" @scrolltolower="onScrolltolower">
     <!-- 已登录: 显示购物车 -->
     <template v-if="memberStore.profile">
       <!-- 购物车列表 -->
@@ -139,7 +156,7 @@ onShow(() => {
         </navigator>
       </view>
       <!-- 吸底工具栏 -->
-      <view class="toolbar">
+      <view class="toolbar" :style="{ paddingBottom: bottomHeight + 'px' }">
         <text class="all" :class="{ checked: true }">全选</text>
         <text class="text">合计:</text>
         <text class="amount">{{ selectedCartPrice }}</text>
@@ -158,7 +175,7 @@ onShow(() => {
       </navigator>
     </view>
     <!-- 猜你喜欢 -->
-    <XtxGuess ref="guessRef"></XtxGuess>
+    <XtxGuess ref="guess"></XtxGuess>
     <!-- 底部占位空盒子 -->
     <view class="toolbar-height"></view>
   </scroll-view>
