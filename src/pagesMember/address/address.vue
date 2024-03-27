@@ -45,7 +45,7 @@ onShow(() => {
             class="item"
             v-for="item in addressList"
             :key="item.id"
-            @tap="addressStore.changeAddress(item)"
+            @tap="addressStore.changeAddress(item), addressStore.changeJuastAddress(item)"
           >
             <view class="item-content">
               <view class="user">

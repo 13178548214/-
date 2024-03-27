@@ -11,6 +11,9 @@ import type { SkuPopupInstance } from '@/components/vk-data-goods-sku-popup/vk-d
 import { computed } from 'vue'
 import type { SkuPopupEvent } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
 import { postMemberCartAPI } from '@/services/cart'
+import type { AddressItem } from '@/types/address'
+import { getMemberAddressAPI } from '@/services/address'
+import { useAddressStore } from '@/stores/modules/address'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -110,8 +113,33 @@ const onAddCart = async (ev: SkuPopupEvent) => {
   isShowSku.value = false
 }
 
+//点击立即购买事件
+const onBuyNow = (ev: SkuPopupEvent) => {
+  //跳转页面并传参
+  uni.navigateTo({
+    url: `/pagesOrder/creat/creat?skuId=${ev._id}&count=${ev.buy_num}`,
+  })
+
+  //关闭组件
+  isShowSku.value = false
+}
+
+//获取地址信息
+const addressList = ref<AddressItem[]>([])
+const getMemberAddress = async () => {
+  const res = await getMemberAddressAPI()
+  addressList.value = res.result
+}
+
+//控制展示的地址
+const addressStore = useAddressStore()
+/* const showAddress = () => {
+  ashowAddress.value = addressStore.selectedAddress
+} */
+const ashowAddress = computed(() => addressStore.selectedJustAddress || '请选择收货地址')
+
 onLoad(() => {
-  getGoodsDetail()
+  getGoodsDetail(), getMemberAddress()
 })
 </script>
 
@@ -126,6 +154,7 @@ onLoad(() => {
     buy-now-background-color="#27BA9B"
     ref="SkupopupRef"
     @add-cart="onAddCart"
+    @buy-now="onBuyNow"
   />
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
@@ -163,7 +192,7 @@ onLoad(() => {
         </view>
         <view class="item arrow" @tap="popupOpen('address')">
           <text class="label">送至</text>
-          <text class="text ellipsis"> 请选择收获地址 </text>
+          <text class="text ellipsis"> {{ ashowAddress }} </text>
         </view>
         <view class="item arrow" @tap="popupOpen('service')">
           <text class="label">服务</text>
@@ -238,7 +267,7 @@ onLoad(() => {
 
   <!-- 弹出层 -->
   <uni-popup ref="popup" type="bottom" background-color="#fff">
-    <addressPanle v-if="popupName === 'address'" @close="popup?.close" />
+    <addressPanle v-if="popupName === 'address'" @close="popup?.close" :addressList="addressList" />
     <servicePanle v-if="popupName === 'service'" @close="popup?.close" />
     <button @tap="popup?.close()">关闭弹层</button>
   </uni-popup>

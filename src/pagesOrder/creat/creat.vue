@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { getMemberOrderPreAPI } from '@/services/order'
+import { getMemberOrderPreAPI, getMemberOrderPreNowAPI } from '@/services/order'
 import type { OrderPreResult } from '@/types/order'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { useAddressStore } from '@/stores/modules/address'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -26,22 +26,45 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
 //定义一个变量
 const orderList = ref<OrderPreResult>()
 
+//接收路由传来的数据
+const query = defineProps<{
+  skuId?: string
+  count?: string
+  addressId?: string
+}>()
+
 // 调用接口获取数据
 const getMemberOrderPre = async () => {
-  const res = await getMemberOrderPreAPI()
-  orderList.value = res.result
+  if (query.count && query.skuId) {
+    //立即购买
+    const res = await getMemberOrderPreNowAPI({
+      count: query.count,
+      skuId: query.skuId,
+      addressId: query.addressId,
+    })
+    orderList.value = res.result
+  } else {
+    //预付订单
+    const res = await getMemberOrderPreAPI()
+    orderList.value = res.result
+  }
 }
 
 //接收store里的地址信息
 const addressStore = useAddressStore()
 
 //展示收货地址
+
 const selectedAddress = computed(() => {
-  return addressStore.selectedAddress || orderList.value?.userAddresses.find((v) => v.isDefault)
+  if (query.count && query.skuId) {
+    return addressStore.selectedAddressNow || addressStore.selectedAddress
+  } else {
+    return addressStore.selectedAddress || orderList.value?.userAddresses.find((v) => v.isDefault)
+  }
 })
 
 //初始化
-onLoad(() => {
+onShow(() => {
   getMemberOrderPre()
 })
 </script>
@@ -130,7 +153,7 @@ onLoad(() => {
     <view class="total-pay symbol">
       <text class="number">{{ orderList?.summary.totalPayPrice.toFixed(2) }}</text>
     </view>
-    <view class="button" :class="{ disabled: true }"> 提交订单 </view>
+    <view class="button" :class="{ disabled: !orderList?.summary.totalPayPrice }"> 提交订单 </view>
   </view>
 </template>
 
