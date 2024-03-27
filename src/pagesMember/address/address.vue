@@ -13,6 +13,7 @@ const getMemberAddress = async () => {
 
 //点击删除键
 const deleteMemberAddress = async (id: string) => {
+  addressStore.deleteaddress = false
   uni.showModal({
     content: '确认删除？',
     success: async (res) => {
@@ -41,13 +42,11 @@ onShow(() => {
       <view v-if="addressList.length" class="address">
         <uni-swipe-action class="address-list">
           <!-- 收货地址项 -->
-          <uni-swipe-action-item
-            class="item"
-            v-for="item in addressList"
-            :key="item.id"
-            @tap="addressStore.changeAddress(item), addressStore.changeJuastAddress(item)"
-          >
-            <view class="item-content">
+          <uni-swipe-action-item class="item" v-for="item in addressList" :key="item.id">
+            <view
+              class="item-content"
+              @tap="addressStore.changeAddress(item), addressStore.changeJuastAddress(item)"
+            >
               <view class="user">
                 {{ item.receiver }}
                 <text class="contact">{{ item.contact }}</text>
@@ -65,7 +64,7 @@ onShow(() => {
             </view>
             <!-- 右侧插槽 -->
             <template #right>
-              <button class="delete-button" @tap="deleteMemberAddress(item.id)">删除</button>
+              <button class="delete-button" @tap="deleteMemberAddress(item.id)">> 删除</button>
             </template>
           </uni-swipe-action-item>
         </uni-swipe-action>

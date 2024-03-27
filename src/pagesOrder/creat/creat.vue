@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { getMemberOrderPreAPI, getMemberOrderPreNowAPI, postMemberOrderAPI } from '@/services/order'
+import {
+  getMemberOrderPreAPI,
+  getMemberOrderPreNowAPI,
+  getMemberOrderRepurchaseByIdAPI,
+  postMemberOrderAPI,
+} from '@/services/order'
 import type { OrderPreResult } from '@/types/order'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import { useAddressStore } from '@/stores/modules/address'
@@ -31,6 +36,7 @@ const query = defineProps<{
   skuId?: string
   count?: string
   addressId?: string
+  orderId?: string
 }>()
 
 // 调用接口获取数据
@@ -42,6 +48,9 @@ const getMemberOrderPre = async () => {
       skuId: query.skuId,
       addressId: query.addressId,
     })
+    orderList.value = res.result
+  } else if (query.orderId) {
+    const res = await getMemberOrderRepurchaseByIdAPI(query.orderId)
     orderList.value = res.result
   } else {
     //预付订单

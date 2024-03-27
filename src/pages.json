@@ -151,12 +151,18 @@
 						"navigationBarTitleText": "订单页"
 					}
 				},
-        {
-          "path": "detail/detail",
+				{
+					"path": "detail/detail",
 					"style": {
 						"navigationBarTitleText": "订单详情"
 					}
-        }
+				},
+				{
+					"path": "create/create",
+					"style": {
+						"navigationBarTitleText": "再次购买"
+					}
+				}
 			]
 		}
 		// {
