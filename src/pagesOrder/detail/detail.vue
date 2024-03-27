@@ -6,6 +6,7 @@ import { onLoad, onReady } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import { orderStateList, OrderState } from '@/services/constants'
 import skeletonDetail from '@/pagesOrder/detail/components/skeletonDetail.vue'
+import { getPayMockAPI, getPayWxPayMiniPayAPI } from '@/services/pay'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -80,6 +81,22 @@ const timeOut = () => {
   orderList.value!.orderState = OrderState.YiQuXiao
 }
 
+//去支付
+const goToPay = async () => {
+  //开发环境
+  if (import.meta.env.DEV) {
+    // 开发环境：模拟支付，修改订单状态为已支付
+    await getPayMockAPI({ orderId: query.id })
+  } else {
+    // 生产环境：获取支付参数 + 发起微信支付
+    const res = await getPayWxPayMiniPayAPI({ orderId: query.id })
+    await wx.requestPayment(res.result)
+  }
+
+  //关闭当前页，跳转到已支付页面
+  uni.redirectTo({ url: '/pagesOrder/payment/payment' })
+}
+
 onLoad(() => {
   getMemberOrderById()
 })
@@ -107,7 +124,7 @@ onLoad(() => {
         <template v-if="orderList.orderState === OrderState.DaiFuKuan">
           <view class="status icon-clock">等待付款</view>
           <view class="tips">
-            <text class="money">应付金额: ¥ 99.00</text>
+            <text class="money">应付金额: ¥ {{ orderList.payMoney }}</text>
             <text class="time">支付剩余</text>
             <uni-countdown
               :second="orderList.countdown"
@@ -118,7 +135,7 @@ onLoad(() => {
               color="#fff"
             />
           </view>
-          <view class="button">去支付</view>
+          <view class="button" @tap="goToPay">去支付</view>
         </template>
         <!-- 其他订单状态:展示再次购买按钮 -->
         <template v-else>
@@ -221,7 +238,7 @@ onLoad(() => {
       <view class="toolbar" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
         <!-- 待付款状态:展示支付按钮 -->
         <template v-if="true">
-          <view class="button primary"> 去支付 </view>
+          <view class="button primary" @tap="goToPay"> 去支付 </view>
           <view class="button" @tap="popup?.open?.()"> 取消订单 </view>
         </template>
         <!-- 其他订单状态:按需展示按钮 -->

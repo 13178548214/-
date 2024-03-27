@@ -162,6 +162,12 @@
 					"style": {
 						"navigationBarTitleText": "再次购买"
 					}
+				},
+				{
+					"path": "payment/payment",
+					"style": {
+						"navigationBarTitleText": "payment"
+					}
 				}
 			]
 		}
