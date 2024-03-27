@@ -150,9 +150,26 @@
 					"style": {
 						"navigationBarTitleText": "订单页"
 					}
-				}
+				},
+        {
+          "path": "detail/detail",
+					"style": {
+						"navigationBarTitleText": "订单详情"
+					}
+        }
 			]
 		}
+		// {
+		// 	"root": "pagesOrder\\creat",
+		// 	"pages": [
+		// 		{
+		// 			"path": "detail/detail",
+		// 			"style": {
+		// 				"navigationBarTitleText": "订单详情"
+		// 			}
+		// 		}
+		// 	]
+		// }
 	],
 	"preloadRule": {
 		"pages/my/my": {

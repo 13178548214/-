@@ -113,17 +113,6 @@ const onAddCart = async (ev: SkuPopupEvent) => {
   isShowSku.value = false
 }
 
-//点击立即购买事件
-const onBuyNow = (ev: SkuPopupEvent) => {
-  //跳转页面并传参
-  uni.navigateTo({
-    url: `/pagesOrder/creat/creat?skuId=${ev._id}&count=${ev.buy_num}`,
-  })
-
-  //关闭组件
-  isShowSku.value = false
-}
-
 //获取地址信息
 const addressList = ref<AddressItem[]>([])
 const getMemberAddress = async () => {
@@ -131,11 +120,24 @@ const getMemberAddress = async () => {
   addressList.value = res.result
 }
 
+const selectedAddress = computed(() => {
+  return addressList.value.find((v) => v.isDefault)
+})
+
+//点击立即购买事件
+const onBuyNow = (ev: SkuPopupEvent) => {
+  //跳转页面并传参
+  uni.navigateTo({
+    url: `/pagesOrder/creat/creat?skuId=${ev._id}&count=${ev.buy_num}&addressId=${selectedAddress.value?.id}`,
+  })
+
+  //关闭组件
+  isShowSku.value = false
+}
+
 //控制展示的地址
 const addressStore = useAddressStore()
-/* const showAddress = () => {
-  ashowAddress.value = addressStore.selectedAddress
-} */
+const HaveaddressId = computed(() => addressStore.selectedAddressNow)
 const ashowAddress = computed(() => addressStore.selectedJustAddress || '请选择收货地址')
 
 onLoad(() => {
