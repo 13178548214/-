@@ -5,8 +5,9 @@ import {
   getMemberOrderConsignmentByIdAPI,
   putMemberOrderByIdReceipt,
   putMemberOrderCancelAPI,
+  getMemberOrderLogisticsByIdAPI,
 } from '@/services/order'
-import type { OrderResult } from '@/types/order'
+import type { LogisticItem, OrderResult } from '@/types/order'
 import { onLoad, onReady } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import { orderStateList, OrderState } from '@/services/constants'
@@ -93,6 +94,13 @@ const orderList = ref<OrderResult>()
 const getMemberOrderById = async () => {
   const res = await getMemberOrderByIdAPI(query.id)
   orderList.value = res.result
+  if (
+    [OrderState.DaiShouHuo, OrderState.YiWanCheng, OrderState.DaiPingJia].includes(
+      orderList.value.orderState,
+    )
+  ) {
+    getMemberOrderLogisticsById()
+  }
 }
 
 //取消订单
@@ -140,6 +148,14 @@ const getItem = async () => {
       }
     },
   })
+}
+
+//订单物流信息
+const getWhereList = ref<LogisticItem[]>([])
+//获取订单物流数据
+const getMemberOrderLogisticsById = async () => {
+  const res = await getMemberOrderLogisticsByIdAPI(query.id)
+  getWhereList.value = res.result.list
 }
 
 onLoad(() => {
@@ -216,16 +232,16 @@ onLoad(() => {
       <!-- 配送状态 -->
       <view class="shipment">
         <!-- 订单物流信息 -->
-        <view v-for="item in 1" :key="item" class="item">
+        <view v-for="item in getWhereList" :key="item.id" class="item">
           <view class="message">
-            您已在广州市天河区黑马程序员完成取件，感谢使用菜鸟驿站，期待再次为您服务。
+            {{ item.text }}
           </view>
-          <view class="date"> 2023-04-14 13:14:20 </view>
+          <view class="date"> {{ item.time }} </view>
         </view>
         <!-- 用户收货地址 -->
         <view class="locate">
-          <view class="user"> 张三 13333333333 </view>
-          <view class="address"> 广东省 广州市 天河区 黑马程序员 </view>
+          <view class="user"> {{ orderList.receiverContact }} {{ orderList.receiverMobile }} </view>
+          <view class="address"> {{ orderList.receiverAddress }} </view>
         </view>
       </view>
 
