@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useGuessList } from '@/composables'
-import { getMemberOrderByIdAPI } from '@/services/order'
+import { getMemberOrderByIdAPI, putMemberOrderCancelAPI } from '@/services/order'
 import type { OrderResult } from '@/types/order'
 import { onLoad, onReady } from '@dcloudio/uni-app'
 import { ref } from 'vue'
@@ -25,6 +25,20 @@ const reasonList = ref([
 ])
 // 订单取消原因
 const reason = ref('')
+
+//订单取消函数
+const theCuse = async (reason: string) => {
+  if (reason) {
+    const res = await putMemberOrderCancelAPI(query.id, { cancelReason: reason })
+    orderList.value! = res.result
+  } else {
+    uni.showToast({
+      title: '请选择取消原因',
+      icon: 'none',
+    })
+  }
+}
+
 // 复制内容
 const onCopy = (id: string) => {
   // 设置系统剪贴板的内容
@@ -277,7 +291,7 @@ onLoad(() => {
       </view>
       <view class="footer">
         <view class="button" @tap="popup?.close?.()">取消</view>
-        <view class="button primary">确认</view>
+        <view class="button primary" @tap="theCuse(reason), popup?.close?.()">确认</view>
       </view>
     </view>
   </uni-popup>

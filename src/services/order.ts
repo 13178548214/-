@@ -58,3 +58,15 @@ export const getMemberOrderRepurchaseByIdAPI = (id: string) => {
     url: `/member/order/repurchase/${id}`,
   })
 }
+
+/*
+取消订单
+/member/order/{id}/cancel
+*/
+export const putMemberOrderCancelAPI = (id: string, data: { cancelReason: string }) => {
+  return http<OrderResult>({
+    method: 'PUT',
+    url: `/member/order/${id}/cancel`,
+    data,
+  })
+}
