@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useGuessList } from '@/composables'
-import { getMemberOrderByIdAPI, putMemberOrderCancelAPI } from '@/services/order'
+import {
+  getMemberOrderByIdAPI,
+  getMemberOrderConsignmentByIdAPI,
+  putMemberOrderByIdReceipt,
+  putMemberOrderCancelAPI,
+} from '@/services/order'
 import type { OrderResult } from '@/types/order'
 import { onLoad, onReady } from '@dcloudio/uni-app'
 import { ref } from 'vue'
@@ -108,7 +113,33 @@ const goToPay = async () => {
   }
 
   //关闭当前页，跳转到已支付页面
-  uni.redirectTo({ url: '/pagesOrder/payment/payment' })
+  uni.redirectTo({ url: `/pagesOrder/payment/payment?id=${query.id}` })
+}
+
+//定义是否在开发环境
+const isDev = import.meta.env.DEV
+
+//模拟收货
+const onSendOrder = async () => {
+  if (isDev) {
+    await getMemberOrderConsignmentByIdAPI(query.id)
+    uni.showToast({ title: '模拟发货完成', icon: 'success' })
+    //手动修改订单状态
+    orderList.value!.orderState = OrderState.DaiShouHuo
+  }
+}
+
+//确认收货
+const getItem = async () => {
+  uni.showModal({
+    content: '是否确认收货？',
+    success: async (res) => {
+      if (res.confirm) {
+        const res = await putMemberOrderByIdReceipt(query.id)
+        orderList.value = res.result
+      }
+    },
+  })
 }
 
 onLoad(() => {
@@ -164,7 +195,21 @@ onLoad(() => {
               再次购买
             </navigator>
             <!-- 待发货状态：模拟发货,开发期间使用,用于修改订单状态为已发货 -->
-            <view v-if="false" class="button"> 模拟发货 </view>
+            <view
+              v-if="isDev && orderList.orderState === OrderState.DaiFaHuo"
+              @tap="onSendOrder"
+              class="button"
+            >
+              模拟发货
+            </view>
+            <!-- 确认收货 -->
+            <view
+              v-if="orderList.orderState === OrderState.DaiShouHuo"
+              @tap="getItem"
+              class="button"
+            >
+              确认收货
+            </view>
           </view>
         </template>
       </view>
@@ -251,7 +296,7 @@ onLoad(() => {
       <view class="toolbar-height" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }"></view>
       <view class="toolbar" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
         <!-- 待付款状态:展示支付按钮 -->
-        <template v-if="true">
+        <template v-if="orderList.orderState === OrderState.DaiFuKuan">
           <view class="button primary" @tap="goToPay"> 去支付 </view>
           <view class="button" @tap="popup?.open?.()"> 取消订单 </view>
         </template>
@@ -265,7 +310,7 @@ onLoad(() => {
             再次购买
           </navigator>
           <!-- 待收货状态: 展示确认收货 -->
-          <view class="button primary"> 确认收货 </view>
+          <view class="button primary" @tap="getItem"> 确认收货 </view>
           <!-- 待评价状态: 展示去评价 -->
           <view class="button"> 去评价 </view>
           <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->

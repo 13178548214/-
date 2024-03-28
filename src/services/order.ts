@@ -59,6 +59,18 @@ export const getMemberOrderRepurchaseByIdAPI = (id: string) => {
   })
 }
 
+/**
+ * 模拟发货-内测版
+ * @description 在DEV环境下使用，仅在订单状态为待发货时，可模拟发货，调用后订单状态修改为待收货，包含模拟物流。
+ * @param id 订单id
+ */
+export const getMemberOrderConsignmentByIdAPI = (id: string) => {
+  return http({
+    method: 'GET',
+    url: `/member/order/consignment/${id}`,
+  })
+}
+
 /*
 取消订单
 /member/order/{id}/cancel
@@ -68,5 +80,16 @@ export const putMemberOrderCancelAPI = (id: string, data: { cancelReason: string
     method: 'PUT',
     url: `/member/order/${id}/cancel`,
     data,
+  })
+}
+
+/*
+确认收货
+/member/order/{id}/receipt
+*/
+export const putMemberOrderByIdReceipt = (id: string) => {
+  return http<OrderResult>({
+    method: 'PUT',
+    url: `/member/order/${id}/receipt`,
   })
 }
