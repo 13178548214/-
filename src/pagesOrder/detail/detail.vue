@@ -6,6 +6,7 @@ import {
   putMemberOrderByIdReceipt,
   putMemberOrderCancelAPI,
   getMemberOrderLogisticsByIdAPI,
+  deleteMemberOrderAPI,
 } from '@/services/order'
 import type { LogisticItem, OrderResult } from '@/types/order'
 import { onLoad, onReady } from '@dcloudio/uni-app'
@@ -158,6 +159,18 @@ const getMemberOrderLogisticsById = async () => {
   getWhereList.value = res.result.list
 }
 
+//删除订单
+const onDeleteOrder = () => {
+  uni.showModal({
+    content: '是否确认删除订单？',
+    success: async (success) => {
+      if (success.confirm) {
+        await deleteMemberOrderAPI({ ids: [query.id] })
+      }
+    },
+  })
+}
+
 onLoad(() => {
   getMemberOrderById()
 })
@@ -250,29 +263,26 @@ onLoad(() => {
         <view class="item">
           <navigator
             class="navigator"
-            v-for="item in 2"
-            :key="item"
-            :url="`/pages/goods/goods?id=${item}`"
+            v-for="item in orderList.skus"
+            :key="item.id"
+            :url="`/pages/goods/goods?id=${item.spuId}`"
             hover-class="none"
           >
-            <image
-              class="cover"
-              src="https://yanxuan-item.nosdn.127.net/c07edde1047fa1bd0b795bed136c2bb2.jpg"
-            ></image>
+            <image class="cover" :src="item.image"></image>
             <view class="meta">
-              <view class="name ellipsis">ins风小碎花泡泡袖衬110-160cm</view>
-              <view class="type">藏青小花， 130</view>
+              <view class="name ellipsis">{{ item.name }}</view>
+              <view class="type">{{ item.attrsText }}</view>
               <view class="price">
                 <view class="actual">
                   <text class="symbol">¥</text>
-                  <text>99.00</text>
+                  <text>{{ item.curPrice }}</text>
                 </view>
               </view>
-              <view class="quantity">x1</view>
+              <view class="quantity">x{{ item.quantity }}</view>
             </view>
           </navigator>
           <!-- 待评价状态:展示按钮 -->
-          <view class="action" v-if="true">
+          <view class="action" v-if="orderList.orderState === OrderState.DaiPingJia">
             <view class="button primary">申请售后</view>
             <navigator url="" class="button"> 去评价 </navigator>
           </view>
@@ -281,15 +291,15 @@ onLoad(() => {
         <view class="total">
           <view class="row">
             <view class="text">商品总价: </view>
-            <view class="symbol">99.00</view>
+            <view class="symbol">{{ orderList.totalMoney }}</view>
           </view>
           <view class="row">
             <view class="text">运费: </view>
-            <view class="symbol">10.00</view>
+            <view class="symbol">{{ orderList.postFee }}</view>
           </view>
           <view class="row">
             <view class="text">应付金额: </view>
-            <view class="symbol primary">109.00</view>
+            <view class="symbol primary">{{ orderList.payMoney }}</view>
           </view>
         </view>
       </view>
@@ -301,7 +311,7 @@ onLoad(() => {
           <view class="item">
             订单编号: {{ query.id }} <text class="copy" @tap="onCopy(query.id)">复制</text>
           </view>
-          <view class="item">下单时间: 2023-04-14 13:14:20</view>
+          <view class="item">下单时间: {{ orderList.createTime }}</view>
         </view>
       </view>
 
@@ -326,11 +336,23 @@ onLoad(() => {
             再次购买
           </navigator>
           <!-- 待收货状态: 展示确认收货 -->
-          <view class="button primary" @tap="getItem"> 确认收货 </view>
+          <view
+            class="button primary"
+            @tap="getItem"
+            v-if="orderList.orderState === OrderState.DaiShouHuo"
+          >
+            确认收货
+          </view>
           <!-- 待评价状态: 展示去评价 -->
-          <view class="button"> 去评价 </view>
+          <view class="button" v-if="orderList.orderState === OrderState.DaiPingJia"> 去评价 </view>
           <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->
-          <view class="button delete"> 删除订单 </view>
+          <view
+            class="button delete"
+            v-if="orderList.orderState >= OrderState.DaiPingJia"
+            @tap="onDeleteOrder"
+          >
+            删除订单
+          </view>
         </template>
       </view>
     </template>
