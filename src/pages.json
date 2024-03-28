@@ -155,19 +155,25 @@
 					"path": "detail/detail",
 					"style": {
 						"navigationBarTitleText": "订单详情",
-            "navigationStyle": "custom"
+						"navigationStyle": "custom"
 					}
 				},
-				{
+				/* {
 					"path": "create/create",
 					"style": {
 						"navigationBarTitleText": "再次购买"
 					}
-				},
+				}, */
 				{
 					"path": "payment/payment",
 					"style": {
 						"navigationBarTitleText": "payment"
+					}
+				},
+				{
+					"path": "list/list",
+					"style": {
+						"navigationBarTitleText": "订单列表"
 					}
 				}
 			]
